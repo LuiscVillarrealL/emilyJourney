@@ -8,8 +8,6 @@ public class SmartObjectManager : MonoBehaviour
 
     public List<SmartObject> RegisteredObjects { get; private set; } = new List<SmartObject>();  
 
-
-
     private void Awake()
     {
         if(Instance != null)
