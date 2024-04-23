@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.CullingGroup;
 
-public enum EStat
+[System.Serializable]
+public class AIStatConfiguration
 {
-    Energy,
-    Fun
+    [field: SerializeField] public AIStat LinkedStat { get; private set; }
+
+    [field: SerializeField] public bool OverrideDefaults { get; private set; } = false;
+    [field: SerializeField, Range(0f, 1f)] public float Override_InitialValue { get; protected set; } = 0.5f;
+    [field: SerializeField, Range(0f, 1f)] public float Override_DecayRate { get; protected set; } = 0.005f;
 }
 
 [RequireComponent(typeof(BaseNavigation))]
@@ -14,32 +17,31 @@ public class CommonAIBase : MonoBehaviour
 {
     [Header("General")]
     [SerializeField] int HouseholdID = 1;
+    [field: SerializeField] AIStatConfiguration[] Stats;
+    [SerializeField] protected FeedbackUIPanel LinkedUI;
 
-
-    [Header("Energy")]
-    [SerializeField] float InitialEnergyLevel = 0.5f;
-    [SerializeField] float baseEnergyDecayRate = 0.05f;
-    [SerializeField] UnityEngine.UI.Slider EnergyDisplay;
-
-    [Header("Fun")]
-    [SerializeField] float InitialFunLevel = 0.5f;
-    [SerializeField] float baseFunDecayRate = 0.05f;
-    [SerializeField] UnityEngine.UI.Slider FunDisplay;
+    [Header("Traits")]
+    [SerializeField] protected List<Trait> Traits;
 
     protected BaseNavigation Navigation;
+    protected bool StartedPerforming = false;
+
+    public Blackboard IndividualBlackboard { get; protected set; }
+    public Blackboard HouseholdBlackboard { get; protected set; }
+
+    protected Dictionary<AIStat, float> DecayRates = new Dictionary<AIStat, float>();
+    protected Dictionary<AIStat, AIStatPanel> StatUIPanels = new Dictionary<AIStat, AIStatPanel>();
+
     protected BaseInteraction CurrentInteraction
     {
         get
         {
-
             BaseInteraction interaction = null;
-
             IndividualBlackboard.TryGetGeneric(EBlackboardKey.Character_FocusObject, out interaction, null);
-
             return interaction;
         }
-        set {
-
+        set
+        {
             BaseInteraction previousInteraction = null;
             IndividualBlackboard.TryGetGeneric(EBlackboardKey.Character_FocusObject, out previousInteraction, null);
 
@@ -68,42 +70,43 @@ public class CommonAIBase : MonoBehaviour
                 if (objectsInUse.Remove(previousInteraction.gameObject))
                     HouseholdBlackboard.SetGeneric(EBlackboardKey.Household_ObjectsInUse, objectsInUse);
             }
-
         }
     }
-    protected bool StartedPerforming = false;
-
-    public float CurrentFun
-    {
-
-        get { return IndividualBlackboard.GetFloat(EBlackboardKey.Character_Stat_Fun); }
-        set { IndividualBlackboard.Set(EBlackboardKey.Character_Stat_Fun, value); }
-    }
-    public float CurrentEnergy {
-
-        get{ return IndividualBlackboard.GetFloat(EBlackboardKey.Character_Stat_Energy);}
-        set { IndividualBlackboard.Set(EBlackboardKey.Character_Stat_Energy, value); }
-    }
-
-    public Blackboard IndividualBlackboard { get; protected set; }
-
-    public Blackboard HouseholdBlackboard { get; protected set; }
 
     protected virtual void Awake()
     {
-
-        FunDisplay.value = InitialFunLevel;
-        EnergyDisplay.value = InitialEnergyLevel;
         Navigation = GetComponent<BaseNavigation>();
     }
+
     // Start is called before the first frame update
     protected virtual void Start()
     {
         HouseholdBlackboard = BlackboardManager.Instance.GetSharedBlackboard(HouseholdID);
         IndividualBlackboard = BlackboardManager.Instance.GetIndividualBlackboard(this);
 
-        IndividualBlackboard.Set(EBlackboardKey.Character_Stat_Energy, InitialEnergyLevel);
-        IndividualBlackboard.Set(EBlackboardKey.Character_Stat_Fun, InitialFunLevel);
+        // setup the stats
+        foreach (var statConfig in Stats)
+        {
+            var linkedStat = statConfig.LinkedStat;
+            float initialValue = statConfig.OverrideDefaults ? statConfig.Override_InitialValue : linkedStat.InitialValue;
+            float decayRate = statConfig.OverrideDefaults ? statConfig.Override_DecayRate : linkedStat.DecayRate;
+
+            DecayRates[linkedStat] = decayRate;
+            IndividualBlackboard.SetStat(linkedStat, initialValue);
+
+            if (linkedStat.IsVisible)
+                StatUIPanels[linkedStat] = LinkedUI.AddStat(linkedStat, initialValue);
+        }
+    }
+
+    protected float ApplyTraitsTo(AIStat targetStat, Trait.ETargetType targetType, float currentValue)
+    {
+        foreach (var trait in Traits)
+        {
+            currentValue = trait.Apply(targetStat, targetType, currentValue);
+        }
+
+        return currentValue;
     }
 
     // Update is called once per frame
@@ -116,32 +119,35 @@ public class CommonAIBase : MonoBehaviour
                 StartedPerforming = true;
                 CurrentInteraction.Perform(this, OnInteractionFinished);
             }
-
         }
 
-
-        CurrentFun = Mathf.Clamp01(CurrentFun - baseFunDecayRate * Time.deltaTime);
-        FunDisplay.value = CurrentFun;
-
-        CurrentEnergy = Mathf.Clamp01(CurrentEnergy - baseEnergyDecayRate * Time.deltaTime);
-        EnergyDisplay.value = CurrentEnergy;
+        // apply the decay rate
+        foreach (var statConfig in Stats)
+        {
+            UpdateIndividualStat(statConfig.LinkedStat, -DecayRates[statConfig.LinkedStat] * Time.deltaTime, Trait.ETargetType.DecayRate);
+        }
     }
 
     protected virtual void OnInteractionFinished(BaseInteraction interaction)
     {
-        interaction.UnlockInteraction();
+        interaction.UnlockInteraction(this);
         CurrentInteraction = null;
-        Debug.Log($"Finished {interaction.DisplayName} ");
+        Debug.Log($"Finished {interaction.DisplayName}");
     }
 
-    public void UpdateIndividualStat(EStat target, float amount)
+    public void UpdateIndividualStat(AIStat linkedStat, float amount, Trait.ETargetType targetType)
     {
-        switch (target)
-        {
-            case EStat.Energy: CurrentEnergy += amount; break;
-            case EStat.Fun: CurrentFun += amount; break;
-        }
-        
+        float adjustedAmount = ApplyTraitsTo(linkedStat, targetType, amount);
+        float newValue = Mathf.Clamp01(GetStatValue(linkedStat) + adjustedAmount);
 
+        IndividualBlackboard.SetStat(linkedStat, newValue);
+
+        if (linkedStat.IsVisible)
+            StatUIPanels[linkedStat].OnStatChanged(newValue);
+    }
+
+    public float GetStatValue(AIStat linkedStat)
+    {
+        return IndividualBlackboard.GetStat(linkedStat);
     }
 }
