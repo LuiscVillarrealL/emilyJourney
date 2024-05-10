@@ -17,8 +17,8 @@ public class CommonAIBase : MonoBehaviour
 {
     [Header("General")]
     [SerializeField] int HouseholdID = 1;
-    [field: SerializeField] AIStatConfiguration[] Stats;
-    [SerializeField] protected FeedbackUIPanel LinkedUI;
+    [field: SerializeField] public AIStatConfiguration[] Stats;
+    public FeedbackUIPanel LinkedUI;
 
     [Header("Traits")]
     [SerializeField] protected List<Trait> Traits;
@@ -132,6 +132,7 @@ public class CommonAIBase : MonoBehaviour
     {
         interaction.UnlockInteraction(this);
         CurrentInteraction = null;
+        LinkedUI.RegenerateButtons();
         Debug.Log($"Finished {interaction.DisplayName}");
     }
 
@@ -149,5 +150,17 @@ public class CommonAIBase : MonoBehaviour
     public float GetStatValue(AIStat linkedStat)
     {
         return IndividualBlackboard.GetStat(linkedStat);
+    }
+
+
+
+    // Update the specific stat when on the rug
+    public void UpdateStatsOnRug(AIStatConfiguration rugStat)
+    {
+
+            AIStat linkedStat = rugStat.LinkedStat;
+            float amount = 0.0007f; // Amount to increase the stat when on the rug
+            UpdateIndividualStat(linkedStat, amount, Trait.ETargetType.Score);
+        
     }
 }

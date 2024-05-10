@@ -75,6 +75,9 @@ public class SimpleInteraction : BaseInteraction
             PerformersToCleanup.Add(performer);
             Debug.LogWarning($"{performer.name} did not unlock interaction in their OnCompleted handler for {_DisplayName}");
         }
+
+
+
     }
 
     public override bool UnlockInteraction(CommonAIBase performer)

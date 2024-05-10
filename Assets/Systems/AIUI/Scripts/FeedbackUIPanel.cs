@@ -1,23 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class FeedbackUIPanel : MonoBehaviour
 {
-    [SerializeField] GameObject StatPanelPrefab;
-    [SerializeField] Transform StatRoot;
+    public GameObject interactionButtonPrefab;
+    public Transform interactionButtonParent;
 
-    // Start is called before the first frame update
-    void Start()
-    {
+    public PickInteractionAI interactionAI;
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    public GameObject StatPanelPrefab;
+    public Transform StatRoot;
 
     public AIStatPanel AddStat(AIStat linkedStat, float initialValue)
     {
@@ -28,4 +23,11 @@ public class FeedbackUIPanel : MonoBehaviour
 
         return statPanelLogic;
     }
+
+    public void RegenerateButtons()
+    {
+        interactionAI.GenerateInteractionButtons();
+    }
+
+
 }
