@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.TextCore.Text;
 
 public class SimpleInteraction : BaseInteraction
 {
@@ -18,10 +19,32 @@ public class SimpleInteraction : BaseInteraction
 
     protected List<CommonAIBase> PerformersToCleanup = new List<CommonAIBase>();
 
-    public override bool CanPerform()
+    [SerializeField] protected List<BaseInteraction> Prerequisites; // List of interactions that must be completed before this one
+
+
+    public override bool CanPerform(CommonAIBase character)
     {
+        // Check if any of the prerequisites are completed by the character
+
+        if (Prerequisites.Count > 0)
+        {
+            foreach (var prerequisite in Prerequisites)
+            {
+                if (character.HasCompletedInteraction(prerequisite))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
         return NumCurrentUsers < MaxSimultaneousUsers;
+
+       
     }
+
 
     public override bool LockInteraction(CommonAIBase performer)
     {
@@ -56,7 +79,8 @@ public class SimpleInteraction : BaseInteraction
             if (StatChanges.Length > 0)
                 ApplyStatChanges(performer, 1f);
 
-            OnInteractionCompleted(performer, onCompleted);
+            
+                OnInteractionCompleted(performer, onCompleted);
         }
         else if (InteractionType == EInteractionType.OverTime)
         {
@@ -74,6 +98,19 @@ public class SimpleInteraction : BaseInteraction
         {
             PerformersToCleanup.Add(performer);
             Debug.LogWarning($"{performer.name} did not unlock interaction in their OnCompleted handler for {_DisplayName}");
+        }
+
+        performer.MarkInteractionCompleted(this);
+
+
+        foreach (var prerequisite in Prerequisites)
+        {
+            if (performer.HasCompletedInteraction(prerequisite))
+            {
+                performer.ClearInteraction(prerequisite);
+
+                performer.GetComponent<PickInteractionAI>().ClearInteractionButtons();
+            }
         }
 
 
@@ -120,5 +157,9 @@ public class SimpleInteraction : BaseInteraction
             CurrentPerformers.Remove(performer);
         PerformersToCleanup.Clear();
     }
+
+
+
+
 }
 

@@ -12,8 +12,8 @@ public class TVInteraction_watch : SimpleInteraction
     {
         LinkedTV = GetComponent<SmartObject_TV>();
     }
-    public override bool CanPerform()
+    public override bool CanPerform(CommonAIBase character)
     {
-        return base.CanPerform() && LinkedTV.IsOn;
+        return base.CanPerform(character) && LinkedTV.IsOn;
     }
 }

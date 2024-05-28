@@ -32,6 +32,10 @@ public class CommonAIBase : MonoBehaviour
     protected Dictionary<AIStat, float> DecayRates = new Dictionary<AIStat, float>();
     protected Dictionary<AIStat, AIStatPanel> StatUIPanels = new Dictionary<AIStat, AIStatPanel>();
 
+
+    private Dictionary<BaseInteraction, List<GameObject>> completedInteractions = new Dictionary<BaseInteraction, List<GameObject>>();
+
+
     protected BaseInteraction CurrentInteraction
     {
         get
@@ -141,7 +145,22 @@ public class CommonAIBase : MonoBehaviour
         float adjustedAmount = ApplyTraitsTo(linkedStat, targetType, amount);
         float newValue = Mathf.Clamp01(GetStatValue(linkedStat) + adjustedAmount);
 
+
         IndividualBlackboard.SetStat(linkedStat, newValue);
+
+        //if (linkedStat.ConnectedStat != null)
+        //{
+        //    float linkedAmount = GetStatValue(linkedStat.ConnectedStat);
+        //    float newLinkedValue = Mathf.Clamp01((GetStatValue(linkedStat) * linkedStat.ConnectedStatChangeRate) + linkedAmount);
+        //    Debug.Log($"linkedAmount {linkedAmount}");
+        //    Debug.Log($"newLinkedValue {newLinkedValue}");
+
+
+        //    IndividualBlackboard.SetStat(linkedStat.ConnectedStat, newLinkedValue);
+
+        //    if (linkedStat.ConnectedStat.IsVisible)
+        //        StatUIPanels[linkedStat.ConnectedStat].OnStatChanged(newLinkedValue);
+        //}
 
         if (linkedStat.IsVisible)
             StatUIPanels[linkedStat].OnStatChanged(newValue);
@@ -163,4 +182,33 @@ public class CommonAIBase : MonoBehaviour
             UpdateIndividualStat(linkedStat, amount, Trait.ETargetType.Score);
         
     }
+
+
+    public bool HasCompletedInteraction(BaseInteraction interaction)
+    {
+        return completedInteractions.ContainsKey(interaction);
+    }
+
+    public void MarkInteractionCompleted(BaseInteraction interaction)
+    {
+        if (!completedInteractions.ContainsKey(interaction))
+        {
+            completedInteractions[interaction] = new List<GameObject>();
+        }
+
+        completedInteractions[interaction].Add(interaction.gameObject);
+    }
+
+    public void ClearInteraction(BaseInteraction interaction)
+    {
+
+        if (completedInteractions.ContainsKey(interaction))
+        {
+            completedInteractions.Remove(interaction);
+        }
+
+    }
+
+
+
 }

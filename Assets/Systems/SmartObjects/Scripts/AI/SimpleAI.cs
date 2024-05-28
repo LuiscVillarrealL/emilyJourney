@@ -38,7 +38,7 @@ public class SimpleAI : CommonAIBase
         int interactionIndex = Random.Range(0, selectedObject.Interactions.Count);
         var selectedInteraction = selectedObject.Interactions[interactionIndex];
 
-        if (selectedInteraction.CanPerform())
+        if (selectedInteraction.CanPerform(this))
         {
             CurrentInteraction = selectedInteraction;
             CurrentInteraction.LockInteraction(this);

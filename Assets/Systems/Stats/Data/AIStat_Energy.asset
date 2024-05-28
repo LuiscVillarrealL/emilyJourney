@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <DisplayName>k__BackingField: Energy
   <IsVisible>k__BackingField: 1
-  <InitialValue>k__BackingField: 0.5
+  <InitialValue>k__BackingField: 1
   <DecayRate>k__BackingField: 0.005
+  <ConnectedStat>k__BackingField: {fileID: 0}
+  <ConnectedStatChangeRate>k__BackingField: 0.005

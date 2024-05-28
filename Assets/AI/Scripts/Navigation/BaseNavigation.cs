@@ -7,10 +7,9 @@ public abstract class BaseNavigation : MonoBehaviour
 {
     public enum EState
     {
-        Idle                = 0,
-        FindingPath         = 1,
-        FollowingPath       = 2,
-
+        Idle = 0,
+        FindingPath = 1,
+        FollowingPath = 2,
         Failed_NoPathExists = 100
     }
 
@@ -19,19 +18,19 @@ public abstract class BaseNavigation : MonoBehaviour
     [SerializeField] protected float MaxMoveSpeed = 5f;
     [SerializeField] protected float RotationSpeed = 120f;
 
-    [Header("Aniamtion")]
+    [Header("Animation")]
     [SerializeField] protected Animator AnimController;
-
 
     [Header("Debug Tools")]
     [SerializeField] protected bool DEBUG_UseMoveTarget;
     [SerializeField] protected Transform DEBUG_MoveTarget;
     [SerializeField] protected bool DEBUG_ShowHeading;
 
-    public Vector3 Destination { get; private set; }
+    public Vector3 Destination { get; protected set; }
     public EState State { get; private set; } = EState.Idle;
 
     public bool IsFindingOrFollowingPath => State == EState.FindingPath || State == EState.FollowingPath;
+
     public bool IsAtDestination
     {
         get
@@ -46,13 +45,11 @@ public abstract class BaseNavigation : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         Initialise();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (DEBUG_UseMoveTarget)
@@ -75,17 +72,17 @@ public abstract class BaseNavigation : MonoBehaviour
             Tick_PathFollowing();
     }
 
-    public bool SetDestination(Vector3 newDestination)
+    public virtual bool SetDestination(Vector3 newDestination)
     {
-        // location is already our destination?
         Vector3 destinationDelta = newDestination - Destination;
         destinationDelta.y = 0f;
+
         if (IsFindingOrFollowingPath && (destinationDelta.magnitude <= DestinationReachedThreshold))
             return true;
-        
-        // are we already near the destination
+
         destinationDelta = newDestination - transform.position;
         destinationDelta.y = 0f;
+
         if (destinationDelta.magnitude <= DestinationReachedThreshold)
             return true;
 

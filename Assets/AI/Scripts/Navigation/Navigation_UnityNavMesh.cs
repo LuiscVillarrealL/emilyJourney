@@ -33,25 +33,44 @@ public class Navigation_UnityNavMesh : BaseNavigation
 
     protected override void Tick_Pathfinding()
     {
-        // no pathfinding in progress?
+        if (LinkedAgent == null)
+            return;
+
         if (!LinkedAgent.pathPending)
         {
+            Debug.Log($"Path status: {LinkedAgent.pathStatus}");
             if (LinkedAgent.pathStatus == NavMeshPathStatus.PathComplete)
+            {
                 OnPathFound();
-            else
+            }
+            else if (LinkedAgent.pathStatus == NavMeshPathStatus.PathPartial)
+            {
+                Debug.LogWarning("Path is partial, but we'll attempt to follow it.");
+                OnPathFound();
+            }
+            else if (LinkedAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+                Debug.LogError("Failed to find path - PathInvalid");
                 OnFailedToFindPath();
+            }
         }
     }
 
     protected override void Tick_PathFollowing()
     {
+        if (LinkedAgent == null)
+            return;
+
         bool atDestination = false;
-        // do we have a path and we near the destination?
-        if (LinkedAgent.hasPath && LinkedAgent.remainingDistance <= LinkedAgent.stoppingDistance)
+
+        if (LinkedAgent.hasPath && !LinkedAgent.pathPending)
         {
-            atDestination = true;
+            if (LinkedAgent.remainingDistance <= LinkedAgent.stoppingDistance)
+            {
+                atDestination = true;
+            }
         }
-        else if (LinkedAgent.hasPath == false)
+        else if (!LinkedAgent.hasPath)
         {
             Vector3 vecToDestination = Destination - transform.position;
             float heightDelta = Mathf.Abs(vecToDestination.y);
@@ -65,10 +84,22 @@ public class Navigation_UnityNavMesh : BaseNavigation
         {
             OnReachedDestination();
         }
-        else
+        else if (LinkedAgent.pathStatus == NavMeshPathStatus.PathInvalid)
         {
-            if (DEBUG_ShowHeading)
+            OnFailedToFindPath();
+        }
+        else if (LinkedAgent.pathStatus == NavMeshPathStatus.PathPartial)
+        {
+            // Handle partial path by moving closer manually if near destination
+            Vector3 vecToDestination = Destination - transform.position;
+            if (vecToDestination.magnitude <= DestinationReachedThreshold * 2)
+            {
+                LinkedAgent.Move(vecToDestination.normalized * (LinkedAgent.speed * Time.deltaTime));
+            }
+            else if (DEBUG_ShowHeading)
+            {
                 Debug.DrawLine(transform.position + Vector3.up, LinkedAgent.steeringTarget, Color.green);
+            }
         }
     }
 
@@ -100,4 +131,36 @@ public class Navigation_UnityNavMesh : BaseNavigation
         return false;
     }
 
+    public override bool SetDestination(Vector3 newDestination)
+    {
+        // Log the new destination being set
+        Debug.Log($"Setting destination to {newDestination}");
+
+        // Check if the new destination is on the nav mesh
+        if (NavMesh.SamplePosition(newDestination, out NavMeshHit hit, 1.0f, NavMesh.AllAreas))
+        {
+            newDestination = hit.position;
+
+            // location is already our destination?
+            Vector3 destinationDelta = newDestination - Destination;
+            destinationDelta.y = 0f;
+            if (IsFindingOrFollowingPath && (destinationDelta.magnitude <= DestinationReachedThreshold))
+                return true;
+
+            // are we already near the destination
+            destinationDelta = newDestination - transform.position;
+            destinationDelta.y = 0f;
+            if (destinationDelta.magnitude <= DestinationReachedThreshold)
+                return true;
+
+            Destination = newDestination;
+
+            return RequestPath();
+        }
+        else
+        {
+            Debug.LogError("Requested destination is outside the NavMesh bounds.");
+            return false;
+        }
+    }
 }

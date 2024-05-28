@@ -15,4 +15,6 @@ MonoBehaviour:
   <DisplayName>k__BackingField: Frustration
   <IsVisible>k__BackingField: 1
   <InitialValue>k__BackingField: 0
-  <DecayRate>k__BackingField: 0.005
+  <DecayRate>k__BackingField: 0.025
+  <ConnectedStat>k__BackingField: {fileID: 11400000, guid: ecdb22bb07d97f64e9faec807241b118, type: 2}
+  <ConnectedStatChangeRate>k__BackingField: 0.256

@@ -77,7 +77,7 @@ public class NotSoSimpleAI : CommonAIBase
             // loop through all the interactions
             foreach (var interaction in smartObject.Interactions)
             {
-                if (!interaction.CanPerform())
+                if (!interaction.CanPerform(this))
                     continue;
 
                 // skip if someone else is using

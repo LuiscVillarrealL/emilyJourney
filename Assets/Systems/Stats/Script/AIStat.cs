@@ -9,4 +9,8 @@ public class AIStat : ScriptableObject
     [field: SerializeField] public bool IsVisible { get; protected set; } = true;
     [field: SerializeField, Range(0f, 1f)] public float InitialValue { get; protected set; } = 0.5f;
     [field: SerializeField, Range(0f, 1f)] public float DecayRate { get; protected set; } = 0.005f;
+
+    [field: SerializeField] public AIStat ConnectedStat { get; protected set; }
+    [field: SerializeField, Range(0f, 1f)] public float ConnectedStatChangeRate { get; protected set; } = 0.005f;
+
 }
