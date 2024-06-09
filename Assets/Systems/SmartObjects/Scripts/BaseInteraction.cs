@@ -25,7 +25,9 @@ public abstract class BaseInteraction : MonoBehaviour
     [SerializeField] protected float _Duration = 0f;
     [SerializeField, FormerlySerializedAs("StatChanges")] protected InteractionStatChange[] _StatChanges;
 
-    
+    [SerializeField] private string _InteractionID = System.Guid.NewGuid().ToString(); // Unique identifier
+
+
 
     public string DisplayName => _DisplayName;
     public EInteractionType InteractionType => _InteractionType;
@@ -37,21 +39,19 @@ public abstract class BaseInteraction : MonoBehaviour
     public abstract bool Perform(CommonAIBase performer, UnityAction<BaseInteraction> onCompleted);
     public abstract bool UnlockInteraction(CommonAIBase performer);
 
+    public string InteractionID => _InteractionID; // Public getter for InteractionID
+
     public void ApplyStatChanges(CommonAIBase performer, float proportion)
     {
         foreach (var statChange in StatChanges)
         {
-            float changedValue = statChange.Value * proportion;
+            performer.UpdateIndividualStat(statChange.LinkedStat, statChange.Value * proportion, Trait.ETargetType.Impact);
 
-            if(statChange.LinkedStat.ConnectedStat != null && statChange.LinkedStat.ConnectedStat.ConnectedStat == statChange.LinkedStat)
+            if (statChange.LinkedStat.ConnectedStat != null)
             {
-                Debug.Log($"{statChange.LinkedStat.ConnectedStat} = {performer.GetStatValue(statChange.LinkedStat.ConnectedStat)}");
-                changedValue = changedValue + performer.GetStatValue(statChange.LinkedStat.ConnectedStat) * .005f;
+                float connectedChange = statChange.Value * proportion * statChange.LinkedStat.ConnectedStatChangeRate;
+                performer.UpdateIndividualStat(statChange.LinkedStat.ConnectedStat, connectedChange, Trait.ETargetType.Impact);
             }
-
-            performer.UpdateIndividualStat(statChange.LinkedStat, changedValue, Trait.ETargetType.Impact);
-
-            UpdateConnectedStats(performer, proportion, statChange);
         }
     }
 

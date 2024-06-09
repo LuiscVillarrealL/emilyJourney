@@ -27,11 +27,16 @@ public class SmartObject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        SmartObjectManager.Instance.RegisterSmartObject(this);
+        if (GameManager.Instance.CurrentState == GameState.Playing)
+        {
+            SmartObjectManager.Instance.RegisterSmartObject(this);
+        }
+        
     }
 
     private void OnDestroy()
     {
+
         SmartObjectManager.Instance.DeRegisterSmartObject(this);
     }
 

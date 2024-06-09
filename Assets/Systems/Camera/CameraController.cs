@@ -1,79 +1,109 @@
-using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    public float borderThickness = 10f; // Distance from screen edge to start moving the camera
-    public float cameraSpeed = 10f; // Speed of the camera movement
-    public Bounds cameraBounds; // Define the camera bounds for the current area
+    [Header("Camera Movement")]
+    public float panSpeed = 20f;
+    public float panBorderThickness = 10f; // Thickness in pixels
+    public Vector2 panLimit; // Limits for panning
 
-    private CinemachineVirtualCamera activeVirtualCamera;
-    private Transform activeCameraTransform;
+    [Header("Camera Zoom")]
+    public float scrollSpeed = 20f;
+    public float minY = 20f;
+    public float maxY = 120f;
 
-    void Start()
+    [Header("Camera Rotation")]
+    public float rotationSpeed = 100f;
+    private Vector3 rotateOrigin;
+    private bool isRotating = false;
+
+    private bool canMove = true;
+
+    private void Update()
     {
-        SetActiveVirtualCamera();
+        if (canMove)
+        {
+            HandleMovement();
+            HandleZoom();
+            HandleRotation();
+        }
+
     }
 
-    void Update()
+    public void CanMoveCamera()
     {
-        if (activeVirtualCamera != null)
-        {
-            Vector3 cameraMovement = Vector3.zero;
-
-            if (Input.mousePosition.x <= borderThickness)
-            {
-                cameraMovement.x -= cameraSpeed * Time.deltaTime;
-            }
-            if (Input.mousePosition.x >= Screen.width - borderThickness)
-            {
-                cameraMovement.x += cameraSpeed * Time.deltaTime;
-            }
-            if (Input.mousePosition.y <= borderThickness)
-            {
-                cameraMovement.z -= cameraSpeed * Time.deltaTime;
-            }
-            if (Input.mousePosition.y >= Screen.height - borderThickness)
-            {
-                cameraMovement.z += cameraSpeed * Time.deltaTime;
-            }
-
-            // Apply the camera movement
-            activeCameraTransform.Translate(cameraMovement, Space.World);
-
-            // Clamp the camera position within the defined bounds
-            Vector3 clampedPosition = activeCameraTransform.position;
-            clampedPosition.x = Mathf.Clamp(clampedPosition.x, cameraBounds.min.x, cameraBounds.max.x);
-            clampedPosition.z = Mathf.Clamp(clampedPosition.z, cameraBounds.min.z, cameraBounds.max.z);
-
-            activeCameraTransform.position = clampedPosition;
-        }
+        canMove = true;
     }
 
-    public void SetActiveVirtualCamera()
+    public void DontMoveCamera()
     {
-        CinemachineVirtualCamera[] virtualCameras = FindObjectsOfType<CinemachineVirtualCamera>();
-        foreach (var vcam in virtualCameras)
-        {
-            if (vcam.Priority == 10) // Assuming 10 is the highest priority for the active camera
-            {
-                activeVirtualCamera = vcam;
-                activeCameraTransform = vcam.transform;
-                break;
-            }
-        }
+        canMove = false;
     }
 
-    public void SwitchVirtualCamera(CinemachineVirtualCamera newCamera, Bounds newBounds)
+    private void HandleMovement()
     {
-        if (activeVirtualCamera != null)
+        Vector3 pos = transform.position;
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+        if (Input.GetKey("w") || Input.mousePosition.y >= Screen.height - panBorderThickness)
         {
-            activeVirtualCamera.Priority = 0; // Lower the priority of the current camera
+            pos += forward * panSpeed * Time.deltaTime;
         }
-        newCamera.Priority = 10; // Set the new camera as the active one
-        cameraBounds = newBounds; // Update the camera bounds for the new area
-        SetActiveVirtualCamera(); // Update the active camera
+        if (Input.GetKey("s") || Input.mousePosition.y <= panBorderThickness)
+        {
+            pos -= forward * panSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey("a") || Input.mousePosition.x <= panBorderThickness)
+        {
+            pos -= right * panSpeed * Time.deltaTime;
+        }
+        if (Input.GetKey("d") || Input.mousePosition.x >= Screen.width - panBorderThickness)
+        {
+            pos += right * panSpeed * Time.deltaTime;
+        }
+
+        pos.x = Mathf.Clamp(pos.x, -panLimit.x, panLimit.x);
+        pos.z = Mathf.Clamp(pos.z, -panLimit.y, panLimit.y);
+
+        transform.position = pos;
+    }
+
+    private void HandleZoom()
+    {
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        Vector3 pos = transform.position;
+
+        pos.y -= scroll * scrollSpeed * 100f * Time.deltaTime;
+        pos.y = Mathf.Clamp(pos.y, minY, maxY);
+
+        transform.position = pos;
+    }
+
+    private void HandleRotation()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            isRotating = true;
+            rotateOrigin = Input.mousePosition;
+        }
+        if (Input.GetMouseButtonUp(1))
+        {
+            isRotating = false;
+        }
+
+        if (isRotating)
+        {
+            Vector3 direction = rotateOrigin - Input.mousePosition;
+            rotateOrigin = Input.mousePosition;
+
+            transform.Rotate(Vector3.up, -direction.x * rotationSpeed * Time.deltaTime, Space.World);
+        }
     }
 }

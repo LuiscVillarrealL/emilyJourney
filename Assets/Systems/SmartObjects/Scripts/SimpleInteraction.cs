@@ -113,6 +113,12 @@ public class SimpleInteraction : BaseInteraction
             }
         }
 
+        // Notify the QuestManager that this interaction is completed
+        QuestManager questManager = FindObjectOfType<QuestManager>();
+        if (questManager != null)
+        {
+            questManager.CompleteQuestStep(this);
+        }
 
 
     }

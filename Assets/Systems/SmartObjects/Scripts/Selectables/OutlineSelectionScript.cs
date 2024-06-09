@@ -7,6 +7,14 @@ public class OutlineSelectionScript : MonoBehaviour
     public Transform selection;
     private RaycastHit raycastHit;
 
+    private GameManager gameManager;
+
+
+    void Start()
+    {
+        gameManager = GameManager.Instance; // Get reference to GameManager
+    }
+
     void Update()
     {
         // Highlight
@@ -34,7 +42,8 @@ public class OutlineSelectionScript : MonoBehaviour
         if (Physics.Raycast(ray, out raycastHit))
         {
             highlight = raycastHit.transform;
-            if (highlight.CompareTag("Selectable"))
+            if (gameManager.CurrentState == GameState.Playing && highlight.CompareTag("Selectable") ||
+                gameManager.CurrentState == GameState.Upgrading && highlight.CompareTag("Upgradable"))
             {
                 if (highlight.gameObject.GetComponent<Outline>() != null)
                 {
@@ -48,7 +57,8 @@ public class OutlineSelectionScript : MonoBehaviour
                     outline.OutlineWidth = 7.0f;
                 }
             }
-            else if (highlight.parent != null && highlight.parent.CompareTag("Selectable"))
+            else if (highlight.parent != null && (gameManager.CurrentState == GameState.Playing && highlight.parent.CompareTag("Selectable")
+                || gameManager.CurrentState == GameState.Upgrading && highlight.parent.CompareTag("Upgradable")))
             {
                 if (highlight.parent.GetComponent<Outline>() != null)
                 {
@@ -86,12 +96,12 @@ public class OutlineSelectionScript : MonoBehaviour
                     
                 }
 
-                if (highlight.CompareTag("Selectable"))
+                if (highlight.CompareTag("Selectable") || highlight.CompareTag("Upgradable"))
                 {
                     selection = raycastHit.transform;
                     selection.gameObject.GetComponent<Outline>().enabled = true;
                 }
-                else if(highlight.parent.CompareTag("Selectable"))
+                else if(highlight.parent.CompareTag("Selectable") || highlight.parent.CompareTag("Upgradable"))
                 {
                     selection = raycastHit.transform.parent.transform;
                     selection.gameObject.GetComponent<Outline>().enabled = true;

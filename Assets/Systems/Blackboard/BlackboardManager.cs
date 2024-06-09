@@ -221,23 +221,24 @@ public class Blackboard
     }
 }
 
+
 public class BlackboardManager : MonoBehaviour
 {
-    public static BlackboardManager Instance { get; private set; } = null;
+    public static BlackboardManager Instance { get; private set; }
 
-    Dictionary<MonoBehaviour, Blackboard> IndividualBlackboards = new Dictionary<MonoBehaviour, Blackboard>();
-    Dictionary<int, Blackboard> SharedBlackboards = new Dictionary<int, Blackboard>();
+    private Dictionary<MonoBehaviour, Blackboard> IndividualBlackboards = new Dictionary<MonoBehaviour, Blackboard>();
+    private Dictionary<int, Blackboard> SharedBlackboards = new Dictionary<int, Blackboard>();
 
     private void Awake()
     {
-        if (Instance != null)
+        if (Instance != null && Instance != this)
         {
-            Debug.LogError($"Trying to create second BlackboardManager on {gameObject.name}");
             Destroy(gameObject);
             return;
         }
 
         Instance = this;
+        DontDestroyOnLoad(gameObject); // Persist between scenes
     }
 
     public Blackboard GetIndividualBlackboard(MonoBehaviour requestor)

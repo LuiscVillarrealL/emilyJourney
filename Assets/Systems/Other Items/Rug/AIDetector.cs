@@ -35,6 +35,8 @@ public class AIDetector : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, Mathf.Infinity, rugLayer))
         {
+
+            Debug.Log("On Rug");
             // You can optionally check the hit.collider to identify the rug
             return true;
         }
