@@ -15,6 +15,6 @@ MonoBehaviour:
   <DisplayName>k__BackingField: Energy
   <IsVisible>k__BackingField: 1
   <InitialValue>k__BackingField: 1
-  <DecayRate>k__BackingField: 0.005
+  <DecayRate>k__BackingField: 0
   <ConnectedStat>k__BackingField: {fileID: 0}
   <ConnectedStatChangeRate>k__BackingField: 0.005

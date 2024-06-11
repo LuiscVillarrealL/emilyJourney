@@ -31,6 +31,8 @@ public class UpgradeManager : MonoBehaviour
 
     private bool isInitialized = false;
 
+    public bool upgradesStartedOnce = false;
+
     private void Awake()
     {
         if (Instance == null)
@@ -79,7 +81,7 @@ public class UpgradeManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"GameObject with name {item.ItemID} not found in the scene.");
+               // Debug.LogError($"GameObject with name {item.ItemID} not found in the scene.");
             }
         }
     }
@@ -94,6 +96,8 @@ public class UpgradeManager : MonoBehaviour
             return;
         }
 
+        
+
         // Enable items
         foreach (var itemID in upgrade.ItemIDsToEnable)
         {
@@ -107,6 +111,7 @@ public class UpgradeManager : MonoBehaviour
                 Debug.LogError($"Item with ID {itemID} not found.");
             }
         }
+        SoundManager.Instance.PlaySFX("money");
 
         // Disable items
         foreach (var itemID in upgrade.ItemIDsToDisable)

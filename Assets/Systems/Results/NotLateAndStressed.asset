@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40311e9e73942ca48a3a72cd88e56662, type: 3}
+  m_Name: NotLateAndStressed
+  m_EditorClassIdentifier: 
+  ResultText: Emily managed to arrive at work on time, but the stress from navigating
+    the barriers in her home lingered. Though she was punctual, the lingering frustration
+    affected her focus and productivity throughout the day, making it hard to concentrate
+    and complete tasks effectively.

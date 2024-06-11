@@ -19,6 +19,12 @@ public class CameraController : MonoBehaviour
 
     private bool canMove = true;
 
+    private float startZ = 0;
+
+    private void Start()
+    {
+        startZ = transform.position.z;
+    }
     private void Update()
     {
         if (canMove)
@@ -70,7 +76,7 @@ public class CameraController : MonoBehaviour
         }
 
         pos.x = Mathf.Clamp(pos.x, -panLimit.x, panLimit.x);
-        pos.z = Mathf.Clamp(pos.z, -panLimit.y, panLimit.y);
+        pos.z = Mathf.Clamp(pos.z, -panLimit.y + startZ, panLimit.y);
 
         transform.position = pos;
     }

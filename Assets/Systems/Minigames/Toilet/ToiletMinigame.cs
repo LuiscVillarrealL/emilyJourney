@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ToiletMinigame : MonoBehaviour
+public class ToiletMinigame : MinigameBase
 {
 
     public GameObject MinigameScreen;
@@ -82,11 +82,4 @@ public class ToiletMinigame : MonoBehaviour
         image.color = color;
     }
 
-    private void CompleteMinigame()
-    {
-        // Perform any actions needed when the minigame is complete
-        Debug.Log("Minigame Complete!");
-        MinigameScreen.SetActive(false);
-
-    }
 }

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class StoveMinigame : MonoBehaviour
+public class StoveMinigame : MinigameBase
 {
     public GameObject minigamePanel;
     public RectTransform panObjects;
@@ -90,7 +90,7 @@ public class StoveMinigame : MonoBehaviour
     private void EndMinigame()
     {
         Debug.Log($"Minigame ended");
-        minigamePanel.SetActive( false );
+        CompleteMinigame();
     }
 
     private void OnLeftButtonPressed()

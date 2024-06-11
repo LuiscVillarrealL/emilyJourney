@@ -9,7 +9,7 @@ public class Foods
     public Sprite[] FoodSprites;
 }
 
-public class CuttingMinigame : MonoBehaviour
+public class CuttingMinigame : MinigameBase
 {
 
     public GameObject minigamePanel;
@@ -68,7 +68,7 @@ public class CuttingMinigame : MonoBehaviour
     private void EndGame()
     {
         Debug.Log("Game Ended");
-        minigamePanel.SetActive(false);
+        CompleteMinigame();
     }
 
     private void DoCut()

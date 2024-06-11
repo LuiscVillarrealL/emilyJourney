@@ -8,12 +8,22 @@ public class GameManager : MonoBehaviour
     {
         { "MainMenu", 0 },
         { "MainScene", 1 },
-         { "Upgrade", 2 }
+         { "Upgrade", 2 },
+         { "Pregame", 3 },
+         { "Results", 4 },
+         { "GameOver", 5 }
     };
 
     public static GameManager Instance { get; private set; }
 
     public GameState CurrentState { get; private set; }
+
+    public float ActualStress = 0;
+    public float LastTime = 0;
+    public AIStat stressStat;
+
+    public bool firstGame = true;
+    
 
 
     private void Awake()
@@ -72,6 +82,9 @@ public class GameManager : MonoBehaviour
             case GameState.GameOver:
                 HandleGameOver();
                 break;
+            case GameState.Pregame:
+                HandlePregame();
+                break;
             default:
                 Debug.LogWarning($"Unhandled game state: {newState}");
                 break;
@@ -87,8 +100,12 @@ public class GameManager : MonoBehaviour
 
     private void HandlePlaying()
     {
+
+
+        // BlackboardManager.Instance.setSt
         Debug.Log("Loading GameScene scene.");
         SceneManager.LoadScene(ScenesDictionary["MainScene"], LoadSceneMode.Single);
+
 
     }
 
@@ -102,8 +119,7 @@ public class GameManager : MonoBehaviour
     private void HandleGameOver()
     {
         Debug.Log("Game over.");
-        // Handle game over logic
-        // Show game over screen
+        SceneManager.LoadScene(ScenesDictionary["GameOver"], LoadSceneMode.Single);
     }
 
     private void HandleUpgrades()
@@ -113,9 +129,21 @@ public class GameManager : MonoBehaviour
         // Handle upgrade logic
     }
 
+    private void HandlePregame()
+    {
+        Debug.Log("Entering upgrade state.");
+        SceneManager.LoadScene(ScenesDictionary["Pregame"], LoadSceneMode.Single);
+        // Handle upgrade logic
+    }
+
     private void HandleResults()
     {
+        CountdownTimer Timer = FindObjectOfType<CountdownTimer>();
+
+        LastTime = Timer.totalTime;
+
         Debug.Log("Entering result state.");
+        SceneManager.LoadScene(ScenesDictionary["Results"], LoadSceneMode.Single);
         // Handle results logic
     }
 

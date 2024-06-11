@@ -68,7 +68,7 @@ public class CommonAIBase : MonoBehaviour
                     HouseholdBlackboard.SetGeneric(EBlackboardKey.Household_ObjectsInUse, objectsInUse);
                 }
             } // we've stopped using something
-            else if (objectsInUse != null)
+            else if (objectsInUse != null && previousInteraction != null)
             {
                 // attempt to remove and update the blackboard if changed
                 if (objectsInUse.Remove(previousInteraction.gameObject))
@@ -109,7 +109,7 @@ public class CommonAIBase : MonoBehaviour
         {
             currentValue = trait.Apply(targetStat, targetType, currentValue);
         }
-
+        
         return currentValue;
     }
 
@@ -148,6 +148,8 @@ public class CommonAIBase : MonoBehaviour
 
         IndividualBlackboard.SetStat(linkedStat, newValue);
 
+        
+
         //if (linkedStat.ConnectedStat != null)
         //{
         //    float linkedAmount = GetStatValue(linkedStat.ConnectedStat);
@@ -178,7 +180,7 @@ public class CommonAIBase : MonoBehaviour
     {
 
             AIStat linkedStat = rugStat.LinkedStat;
-            float amount = 0.0007f; // Amount to increase the stat when on the rug
+            float amount = 0.0008f; // Amount to increase the stat when on the rug
             UpdateIndividualStat(linkedStat, amount, Trait.ETargetType.Score);
         
     }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ClawGrabberMinigame : MonoBehaviour
+public class ClawGrabberMinigame : MinigameBase
 {
     public enum GameMode { ClawMode, ClickMode }
     public GameMode currentMode = GameMode.ClawMode;
@@ -249,7 +249,7 @@ public class ClawGrabberMinigame : MonoBehaviour
     private void EndMinigame()  
     {
         Debug.Log($"Game ended");
-        minigameScreen.SetActive(false);
+        CompleteMinigame();
         // Trigger any additional end of minigame logic here
     }
 

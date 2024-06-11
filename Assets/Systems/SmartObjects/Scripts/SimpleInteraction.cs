@@ -21,10 +21,23 @@ public class SimpleInteraction : BaseInteraction
 
     [SerializeField] protected List<BaseInteraction> Prerequisites; // List of interactions that must be completed before this one
 
+    public bool finishMinigame = false;
 
+    private CommonAIBase currentPerformer;
+    private UnityAction<BaseInteraction> currentOnCompleted;
+
+    private void Start()
+    {
+        finishMinigame = false;
+    }
     public override bool CanPerform(CommonAIBase character)
     {
-        // Check if any of the prerequisites are completed by the character
+        QuestManager questManager = FindObjectOfType<QuestManager>();
+
+        if (questManager.IsEndOfDay(this) && !questManager.AreAllQuestsCompletedExceptStairs() || questManager.IsStepCompleted(this))
+        {
+            return false;
+        }
 
         if (Prerequisites.Count > 0)
         {
@@ -35,15 +48,18 @@ public class SimpleInteraction : BaseInteraction
                     return true;
                 }
             }
-
             return false;
         }
 
+        // Check if this interaction is the end-of-day trigger and if all other quests are completed
+        if (_InteractionType == EInteractionType.OverTime)
+        {
+            return NumCurrentUsers < MaxSimultaneousUsers;
+        }
 
         return NumCurrentUsers < MaxSimultaneousUsers;
-
-       
     }
+
 
 
     public override bool LockInteraction(CommonAIBase performer)
@@ -67,6 +83,10 @@ public class SimpleInteraction : BaseInteraction
 
     public override bool Perform(CommonAIBase performer, UnityAction<BaseInteraction> onCompleted)
     {
+
+        currentPerformer = performer;
+        currentOnCompleted = onCompleted;
+
         if (!CurrentPerformers.ContainsKey(performer))
         {
             Debug.LogError($"{performer.name} is trying to perform an interaction {_DisplayName} that they have not locked");
@@ -85,6 +105,8 @@ public class SimpleInteraction : BaseInteraction
         else if (InteractionType == EInteractionType.OverTime)
         {
             CurrentPerformers[performer] = new PerformerInfo() { ElapsedTime = 0, OnCompleted = onCompleted };
+            StartContinuousStatUpdates(performer); // Start continuous stat updates
+            StartMinigame();
         }
 
         return true;
@@ -138,7 +160,6 @@ public class SimpleInteraction : BaseInteraction
 
     protected virtual void Update()
     {
-        // update any current performers
         foreach (var kvp in CurrentPerformers)
         {
             CommonAIBase performer = kvp.Key;
@@ -153,19 +174,39 @@ public class SimpleInteraction : BaseInteraction
             if (StatChanges.Length > 0)
                 ApplyStatChanges(performer, (performerInfo.ElapsedTime - previousElapsedTime) / _Duration);
 
-            // interaction complete?
-            if (performerInfo.ElapsedTime >= _Duration)
+            if (finishMinigame)
+            {
+                StopContinuousStatUpdates();
                 OnInteractionCompleted(performer, performerInfo.OnCompleted);
+            }
         }
 
-        // cleanup any performers that are finished
         foreach (var performer in PerformersToCleanup)
             CurrentPerformers.Remove(performer);
         PerformersToCleanup.Clear();
     }
 
+    private void StartMinigame()
+    {
+        if (minigame != null)
+        {
+            minigame.gameObject.SetActive(true);
+            minigame.OnMinigameCompleted += CompleteMinigame;
+            minigame.StartMinigame();
+        }
+    }
 
+    public void CompleteMinigame()
+    {
+        if (minigame != null)
+        {
+            minigame.OnMinigameCompleted -= CompleteMinigame;
+            minigame.gameObject.SetActive(false);
+        }
 
+        StopContinuousStatUpdates();
+        OnInteractionCompleted(currentPerformer, currentOnCompleted);
+    }
 
 }
 

@@ -6,6 +6,7 @@ public enum GameState
     Upgrading,
     Result,
     Paused,
+    Pregame,
     GameOver
 }
 

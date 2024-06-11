@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
-public class WashingDishMinigame : MonoBehaviour
+public class WashingDishMinigame : MinigameBase
 {
 
     public GameObject minigamePanel;
@@ -111,6 +111,6 @@ public class WashingDishMinigame : MonoBehaviour
     private void EngMinigame()
     {
         Debug.Log("Dish cleaned!");
-        minigamePanel.SetActive(false);
+        CompleteMinigame();
     }
 }

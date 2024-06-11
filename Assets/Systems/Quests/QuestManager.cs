@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class QuestManager : MonoBehaviour
@@ -6,53 +7,75 @@ public class QuestManager : MonoBehaviour
     [SerializeField] private List<Quest> dailyQuests;
     private Dictionary<string, bool> interactionCompletionStatus;
 
+    public AIStat StressStat;
+
+    [Header("UI Elements")]
+    public GameObject questPanel;
+    public GameObject questItemPrefab;
+
     private void Awake()
     {
         interactionCompletionStatus = new Dictionary<string, bool>();
         InitializeQuests();
+        PopulateQuestPanel();
     }
 
     private void InitializeQuests()
     {
-        //dailyQuests = new List<Quest>();
-        //{
-        //    new Quest
-        //    {
-        //        QuestName = "Cook",
-        //        QuestDescription = "Cook your food before going to work",
-        //        Steps = new List<QuestStep>
-        //        {
-        //            new QuestStep { StepName = "Take ingredients", StepDescription = "Go to the fridge and get the ingredients", RequiredInteractions = new List<BaseInteraction>(), IsCompleted = false, IsEndOfDayTrigger = false },
-        //            new QuestStep { StepName = "Prepare the ingredients", StepDescription = "Go to the cutting board and prepare the ingredients", RequiredInteractions = new List<BaseInteraction>(), IsCompleted = false, IsEndOfDayTrigger = false },
-        //            new QuestStep { StepName = "Cook the ingredients", StepDescription = "Go to the stove and cook the ingredients", RequiredInteractions = new List<BaseInteraction>(), IsCompleted = false, IsEndOfDayTrigger = false },
-
-        //        }
-        //    },
-        //    new Quest
-        //    {
-        //        QuestName = "Do the laundry",
-        //        QuestDescription = "Go to the washing mashine and put the clothes in it",
-        //        Steps = new List<QuestStep>
-        //        {
-        //            new QuestStep { StepName = "Prepare ingredients", StepDescription = "Gather all necessary ingredients", RequiredInteractions = new List<BaseInteraction>(), IsCompleted = false, IsEndOfDayTrigger = false }
-                    
-        //        }
-        //    },
-
-        //       new Quest
-        //    {
-        //        QuestName = "Go to work",
-        //        QuestDescription = "Leave the house",
-        //        Steps = new List<QuestStep>
-        //        {
-        //            new QuestStep { StepName = "Prepare ingredients", StepDescription = "Gather all necessary ingredients", RequiredInteractions = new List<BaseInteraction>(), IsCompleted = false, IsEndOfDayTrigger = true }
-
-        //        }
-        //    },
-        //};
-
-       // LoadQuestState();
+        foreach (var quest in dailyQuests)
+        {
+            foreach (var step in quest.Steps)
+            {
+                interactionCompletionStatus[step.StepName] = false;
+            }
+        }
     }
+    public void PopulateQuestPanel()
+    {
+        foreach (Transform child in questPanel.transform)
+        {
+            Debug.Log($"child {child}");
+            Destroy(child.gameObject); // Clear existing items
+        }
+        GameObject QuestList = Instantiate(questItemPrefab, questPanel.transform);
+
+        QuestList.GetComponentInChildren<TextMeshProUGUI>().text = "Objectives of the day:";
+        QuestList.GetComponentInChildren<TextMeshProUGUI>().color = Color.yellow;
+
+        foreach (var quest in dailyQuests)
+        {
+
+            if (!IsQuestCompleted(quest))
+            {
+                GameObject questItem = Instantiate(questItemPrefab, questPanel.transform);
+
+                questItem.GetComponentInChildren<TextMeshProUGUI>().text = quest.QuestName;
+                questItem.GetComponentInChildren<TextMeshProUGUI>().color = Color.blue;
+
+                GameObject stepTitelItem = Instantiate(questItemPrefab, questPanel.transform);
+                stepTitelItem.GetComponentInChildren<TextMeshProUGUI>().text = "Steps: ";
+                stepTitelItem.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+                foreach (var step in quest.Steps)
+                {
+
+                    if (!step.IsCompleted)
+                    {
+                        GameObject stepItem = Instantiate(questItemPrefab, questPanel.transform);
+
+                        stepItem.GetComponentInChildren<TextMeshProUGUI>().text = step.StepName;
+                    }
+
+
+
+                }
+                GameObject Space = Instantiate(questItemPrefab, questPanel.transform);
+                Space.GetComponentInChildren<TextMeshProUGUI>().text = "";
+            }
+
+
+        }
+    }
+
 
     public List<Quest> GetQuests()
     {
@@ -72,13 +95,30 @@ public class QuestManager : MonoBehaviour
                     step.IsCompleted = true;
                     CheckAllQuestsCompleted(step.IsEndOfDayTrigger);
                     SaveQuestState();
+                    PopulateQuestPanel(); // Update the quest panel
                     return;
                 }
             }
         }
     }
 
-    private void CheckAllQuestsCompleted(bool isEndOfDayTrigger)
+    public bool IsEndOfDay(BaseInteraction interaction)
+    {
+        foreach (var quest in dailyQuests)
+        {
+            foreach (var step in quest.Steps)
+            {
+                if (!step.IsCompleted && step.RequiredInteractions.Contains(interaction))
+                {
+                    return step.IsEndOfDayTrigger;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public bool AreAllQuestsCompleted()
     {
         foreach (var quest in dailyQuests)
         {
@@ -86,12 +126,61 @@ public class QuestManager : MonoBehaviour
             {
                 if (!step.IsCompleted)
                 {
-                    return;
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public bool IsQuestCompleted(Quest quest)
+    {
+
+            foreach (var step in quest.Steps)
+            {
+                if (!step.IsCompleted)
+                {
+                    return false;
+                }
+            
+        }
+        return true;
+    }
+
+    public bool IsStepCompleted(BaseInteraction interaction)
+    {
+        foreach (var quest in dailyQuests)
+        {
+            foreach (var step in quest.Steps)
+            {
+                if (step.RequiredInteractions.Contains(interaction) && step.IsCompleted )
+                {
+                    return true;
                 }
             }
         }
 
-        if (isEndOfDayTrigger)
+        return false;
+    }
+
+    public bool AreAllQuestsCompletedExceptStairs()
+    {
+        foreach (var quest in dailyQuests)
+        {
+            foreach (var step in quest.Steps)
+            {
+                if (!step.IsEndOfDayTrigger && !step.IsCompleted )
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private void CheckAllQuestsCompleted(bool isEndOfDayTrigger)
+    {
+        if (AreAllQuestsCompleted() && isEndOfDayTrigger)
         {
             EndDay();
         }
@@ -100,7 +189,11 @@ public class QuestManager : MonoBehaviour
     private void EndDay()
     {
 
-        GameManager.Instance.ChangeState(GameState.Upgrading);
+        CommonAIBase AIPlayer = FindObjectOfType<CommonAIBase>();
+
+        GameManager.Instance.ActualStress = AIPlayer.IndividualBlackboard.GetStat(StressStat);
+
+        GameManager.Instance.ChangeState(GameState.Result);
         Debug.Log("All quests completed. The day is over.");
     }
 
@@ -147,6 +240,7 @@ public class Quest
     public string QuestName;
     public string QuestDescription;
     public List<QuestStep> Steps;
+    public bool IsCompleted;
 }
 
 [System.Serializable]

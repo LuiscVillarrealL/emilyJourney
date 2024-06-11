@@ -39,7 +39,12 @@ public abstract class BaseInteraction : MonoBehaviour
     public abstract bool Perform(CommonAIBase performer, UnityAction<BaseInteraction> onCompleted);
     public abstract bool UnlockInteraction(CommonAIBase performer);
 
+
     public string InteractionID => _InteractionID; // Public getter for InteractionID
+
+    private Coroutine statUpdateCoroutine;
+
+    [SerializeField] protected MinigameBase minigame;
 
     public void ApplyStatChanges(CommonAIBase performer, float proportion)
     {
@@ -55,16 +60,31 @@ public abstract class BaseInteraction : MonoBehaviour
         }
     }
 
-    private static void UpdateConnectedStats(CommonAIBase performer, float proportion, InteractionStatChange statChange)
+    public void StartContinuousStatUpdates(CommonAIBase performer)
     {
-        // Check if the AIStat has a connected stat
-        if (statChange.LinkedStat.ConnectedStat != null)
+        if (statUpdateCoroutine == null)
         {
-            // Calculate the change for the connected stat based on the connected change rate
-            float connectedChange = statChange.Value * proportion * statChange.LinkedStat.ConnectedStatChangeRate;
-            performer.UpdateIndividualStat(statChange.LinkedStat.ConnectedStat, connectedChange, Trait.ETargetType.Impact);
+            statUpdateCoroutine = StartCoroutine(UpdateStatsContinuously(performer));
         }
-
-
     }
+
+    public void StopContinuousStatUpdates()
+    {
+        if (statUpdateCoroutine != null)
+        {
+            StopCoroutine(statUpdateCoroutine);
+            statUpdateCoroutine = null;
+        }
+    }
+
+    private IEnumerator UpdateStatsContinuously(CommonAIBase performer)
+    {
+        while (true)
+        {
+            ApplyStatChanges(performer, Time.deltaTime);
+            yield return null;
+        }
+    }
+
+
 }

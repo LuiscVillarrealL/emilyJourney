@@ -422,6 +422,7 @@ MonoBehaviour:
   fridgeContent: {fileID: 1138418931}
   arrowButton: {fileID: 2130068578}
   scrollSpeed: 100
+  downScrollSpeed: 100
   isScrollingUp: 0
 --- !u!114 &1068121462 stripped
 MonoBehaviour:

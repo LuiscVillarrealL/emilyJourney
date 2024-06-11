@@ -2,16 +2,18 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class FridgeMinigame : MonoBehaviour
+public class FridgeMinigame : MinigameBase
 {
     public GameObject fridgePanel;
     public RectTransform fridgeContent;
     public Button arrowButton;
     public float scrollSpeed = 100f;
+    public float downScrollSpeed = 100f;
     [SerializeField]
     private bool isScrollingUp = false;
     private bool pressed = false;
     private float maxYPosition;
+
 
     void Start()
     {       
@@ -54,7 +56,7 @@ public class FridgeMinigame : MonoBehaviour
 
     private void ScrollDown()
     {
-        fridgeContent.anchoredPosition += Vector2.up * scrollSpeed * Time.deltaTime;
+        fridgeContent.anchoredPosition += Vector2.up * downScrollSpeed * Time.deltaTime;
         if (fridgeContent.anchoredPosition.y >= maxYPosition)
         {
             fridgeContent.anchoredPosition = new Vector2(fridgeContent.anchoredPosition.x, maxYPosition);
@@ -91,7 +93,8 @@ public class FridgeMinigame : MonoBehaviour
     private void EndMinigame()
     {
         Debug.Log($"Game ended");
-        fridgePanel.SetActive(false);
+        CompleteMinigame();
+        //fridgePanel.SetActive(false);
         // Trigger any additional end of minigame logic here
     }
 }

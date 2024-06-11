@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.Experimental.AssetDatabaseExperimental.AssetDatabaseCounters;
 
-public class GrabClothesMinigame : MonoBehaviour
+public class GrabClothesMinigame : MinigameBase
 {
     public GameObject minigamePanel;
     public RectTransform grabberArm; // Reference to the grabber arm RectTransform
@@ -95,7 +95,7 @@ public class GrabClothesMinigame : MonoBehaviour
 
         foreach (var cloth in clothes)
         {
-            if (RectTransformUtility.RectangleContainsScreenPoint(grabberArm, cloth.position))
+            if (IsOverlapping(grabberArm, cloth))
             {
                 Debug.Log("grabbed!");
                 grabCount++;
@@ -113,6 +113,18 @@ public class GrabClothesMinigame : MonoBehaviour
         isGrabbing = false;
     }
 
+    private bool IsOverlapping(RectTransform rect1, RectTransform rect2)
+    {
+        Rect rect1World = new Rect(rect1.position.x, rect1.position.y, rect1.rect.width, rect1.rect.height);
+        Rect rect2World = new Rect(rect2.position.x, rect2.position.y, rect2.rect.width, rect2.rect.height);
+
+        Debug.Log($"rect1World {rect1World}");
+        Debug.Log($"rect2World {rect2World}");
+
+
+        return rect1World.Overlaps(rect2World);
+    }
+
     private void CheckAllClothesGrabbed()
     {
         foreach (var cloth in clothes)
@@ -128,6 +140,6 @@ public class GrabClothesMinigame : MonoBehaviour
     private void EndMinigame()
     {
         Debug.Log("Minigame Completed!");
-        minigamePanel.SetActive(false);
+        CompleteMinigame();
     }
 }

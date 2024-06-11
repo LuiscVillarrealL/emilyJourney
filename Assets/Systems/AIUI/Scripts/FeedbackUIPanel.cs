@@ -14,6 +14,7 @@ public class FeedbackUIPanel : MonoBehaviour
     public GameObject StatPanelPrefab;
     public Transform StatRoot;
 
+
     public AIStatPanel AddStat(AIStat linkedStat, float initialValue)
     {
         var newGO = Instantiate(StatPanelPrefab, StatRoot);

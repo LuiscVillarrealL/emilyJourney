@@ -19,6 +19,7 @@ public class AIDetector : MonoBehaviour
     [SerializeField] private CommonAIBase aiBase;
 
     [SerializeField] private AIStatConfiguration rugStat;
+    [SerializeField] private AIStatConfiguration rugStat2;
 
     protected Dictionary<AIStat, float> DecayRates = new Dictionary<AIStat, float>();
 
@@ -52,6 +53,7 @@ public class AIDetector : MonoBehaviour
 
             // Update stats when on the rug
             aiBase.UpdateStatsOnRug(rugStat);
+            aiBase.UpdateStatsOnRug(rugStat2);
         }
         else
         {

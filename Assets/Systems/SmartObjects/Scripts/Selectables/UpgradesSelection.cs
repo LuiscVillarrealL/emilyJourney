@@ -13,18 +13,47 @@ public class UpgradesSelection : MonoBehaviour
     [SerializeField] protected Button CancelButton;
     [SerializeField] protected Button ContinueButton;
 
+    [SerializeField] protected TextMeshProUGUI upgradesLeft;
+
     [SerializeField] protected OutlineSelectionScript outlineSelectionScript;
 
     [SerializeField] protected CameraController cameraController;
 
+    [SerializeField] protected GameObject NoticePanel;
+    [SerializeField] protected TextMeshProUGUI NoticePanelDes;
+    [SerializeField] protected Button NoticePanelButton;
+    [SerializeField] protected GameObject NumUpgradesPanel;
+
     private bool ButtonsGenerated = false;
     private GameObject selectedObject = null;
+
+    public int upgradesNeeded = 3;
 
     private void Start()
     {
         BuyButton.onClick.AddListener(OnBuyButtonClicked);
         CancelButton.onClick.AddListener(OnClosePanelClick);
         ContinueButton.onClick.AddListener(OnClosePanelClick);
+        NoticePanelButton.onClick.AddListener(ClearInfoInteractionButtons);
+
+        if (!UpgradeManager.Instance.upgradesStartedOnce)
+        {
+            NoticePanel.SetActive(true);
+            NoticePanelButton.gameObject.SetActive(true);
+            NoticePanelDes.text = "Emily has enough money to make 3 upgrades in her house. Find objects in the house that act as barriers and upgrade them." +
+                "Start with the objects that are more difficult to use.";
+
+
+            UpgradeManager.Instance.upgradesStartedOnce = true;
+        }
+        else
+        {
+            NumUpgradesPanel.gameObject.SetActive(true);
+            NoticePanel.SetActive(false);
+            NoticePanelButton.gameObject.SetActive(false);
+        }
+
+
     }
 
     private void OnClosePanelClick()
@@ -34,6 +63,10 @@ public class UpgradesSelection : MonoBehaviour
 
     void Update()
     {
+
+
+
+        upgradesLeft.text = $"Upgrades left for the day: {upgradesNeeded}";
         if (outlineSelectionScript == null)
         {
             return;
@@ -72,6 +105,16 @@ public class UpgradesSelection : MonoBehaviour
         cameraController.CanMoveCamera();
     }
 
+    private void ClearInfoInteractionButtons()
+    {
+        NoticePanel.gameObject.SetActive(false);
+        NoticePanelDes.gameObject.SetActive(false);
+        NoticePanelButton.gameObject.SetActive(false);
+        NumUpgradesPanel.gameObject.SetActive(true);
+
+        cameraController.CanMoveCamera();
+    }
+
     private void GenerateInteractionButtons()
     {
         if (outlineSelectionScript.selection == null)
@@ -80,20 +123,32 @@ public class UpgradesSelection : MonoBehaviour
         }
 
         panel.SetActive(true);
-        var upgradeHandler = outlineSelectionScript.selection.GetComponent<ItemUpgradeHandler>();
-        if (upgradeHandler != null && upgradeHandler.upgradeSO != null)
+
+        if (upgradesNeeded > 0)
         {
-            Description.text = upgradeHandler.upgradeSO.Description;
-            BuyButton.gameObject.SetActive(true);
-            CancelButton.gameObject.SetActive(true);
-            ContinueButton.gameObject.SetActive(false);
-            cameraController.DontMoveCamera();
+            var upgradeHandler = outlineSelectionScript.selection.GetComponent<ItemUpgradeHandler>();
+            if (upgradeHandler != null && upgradeHandler.upgradeSO != null)
+            {
+                Description.text = upgradeHandler.upgradeSO.Description;
+                BuyButton.gameObject.SetActive(true);
+                CancelButton.gameObject.SetActive(true);
+                ContinueButton.gameObject.SetActive(false);
+                cameraController.DontMoveCamera();
+            }
+            else
+            {
+                Debug.LogWarning("Selected object does not have an ItemUpgradeHandler or UpgradeSO is null.");
+                ClearInteractionButtons();
+            }
         }
         else
         {
-            Debug.LogWarning("Selected object does not have an ItemUpgradeHandler or UpgradeSO is null.");
-            ClearInteractionButtons();
+            Description.text = "Emily can't afford any more upgrades today!";
+            ContinueButton.gameObject.SetActive(true);
+            cameraController.DontMoveCamera();
         }
+
+
     }
 
     private void OnBuyButtonClicked()
@@ -122,6 +177,7 @@ public class UpgradesSelection : MonoBehaviour
         // Your upgrade application logic here
         BuyButton.interactable = false;
         UpgradeManager.Instance.ApplyUpgrade(upgradeID);
+        upgradesNeeded--;
     }
 
     public void UpgradeBought()
@@ -131,11 +187,14 @@ public class UpgradesSelection : MonoBehaviour
             return;
         }
 
+
+
         panel.SetActive(true);
         var upgradeHandler = outlineSelectionScript.selection.GetComponent<ItemUpgradeHandler>();
         if (upgradeHandler != null && upgradeHandler.upgradeSO != null)
         {
             Description.text = upgradeHandler.upgradeSO.DescriptionAfter;
+            BuyButton.interactable = true;
             BuyButton.gameObject.SetActive(false);
             CancelButton.gameObject.SetActive(false);
             ContinueButton.gameObject.SetActive(true);

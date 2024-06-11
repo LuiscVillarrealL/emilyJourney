@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class TubMinigame : MonoBehaviour
+public class TubMinigame : MinigameBase
 {
     public GameObject minigamePanel;
     public RectTransform balanceIndicator; // Reference to the balance indicator RectTransform
@@ -118,12 +118,6 @@ public class TubMinigame : MonoBehaviour
         currentForce += randomForce;
     }
 
-    private void CompleteMinigame()
-    {
-        Debug.Log("Minigame Complete!");
-        // Add actions to handle the minigame completion, such as progressing the game state or giving rewards
-        minigamePanel.SetActive(false);
-    }
 
     private void AddEventTrigger(GameObject target, EventTriggerType eventType, UnityEngine.Events.UnityAction<BaseEventData> action)
     {
