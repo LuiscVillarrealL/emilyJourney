@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40311e9e73942ca48a3a72cd88e56662, type: 3}
+  m_Name: LateAndStressed
+  m_EditorClassIdentifier: 
+  ResultText: Emily arrived late to work, frustrated by the obstacles in her home.
+    Each barrier added precious minutes to her morning routine, causing her to start
+    the day already stressed and flustered. The frustration carried over into her
+    workday, affecting her focus and productivity. Emily struggled to concentrate
+    and complete tasks, making it a particularly difficult and unproductive day at
+    work.

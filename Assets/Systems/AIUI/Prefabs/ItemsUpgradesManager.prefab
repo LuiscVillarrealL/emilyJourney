@@ -1,0 +1,190 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8194182064598537513
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3208197978363303510}
+  - component: {fileID: 588692958609933713}
+  m_Layer: 0
+  m_Name: ItemsUpgradesManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3208197978363303510
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8194182064598537513}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &588692958609933713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8194182064598537513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff56ecc7d4de5124f89e910c47c31662, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  items:
+  - ItemID: Stove
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: CounterWithoutSpaceNoStove
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: CounterWithoutSpaceAndStove
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: CounterWithSpace
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: CounterNoWheelchairWithSink
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: CounterForWheelchairWithSink
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: FridgeTObBottom
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: FridgeSideSide
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: WasherTop
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: WasherFront
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: BedTall
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: BedSmall
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: Rug
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: TowelRackHigh
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: TowelRackLow
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: Tub
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: Shower
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: ToiletNotSafe
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: ToiletSafe
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: ClosetTall
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: ClosetShort
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  - ItemID: Stair
+    ItemGameObject: {fileID: 0}
+    InitialState: 1
+  - ItemID: StairsSafe
+    ItemGameObject: {fileID: 0}
+    InitialState: 0
+  upgrades:
+  - UpgradeID: Stove1
+    ItemIDsToEnable:
+    - CounterWithoutSpaceAndStove
+    ItemIDsToDisable:
+    - Stove
+    - CounterWithoutSpaceNoStove
+    cost: 0
+  - UpgradeID: Stove2
+    ItemIDsToEnable:
+    - CounterWithSpace
+    ItemIDsToDisable:
+    - CounterWithoutSpaceAndStove
+    cost: 0
+  - UpgradeID: Sink
+    ItemIDsToEnable:
+    - CounterForWheelchairWithSink
+    ItemIDsToDisable:
+    - CounterNoWheelchairWithSink
+    cost: 0
+  - UpgradeID: Fridge
+    ItemIDsToEnable:
+    - FridgeSideSide
+    ItemIDsToDisable:
+    - FridgeTObBottom
+    cost: 0
+  - UpgradeID: Washer
+    ItemIDsToEnable:
+    - WasherFront
+    ItemIDsToDisable:
+    - WasherTop
+    cost: 0
+  - UpgradeID: Bed
+    ItemIDsToEnable:
+    - BedSmall
+    ItemIDsToDisable:
+    - BedTall
+    cost: 0
+  - UpgradeID: Rug
+    ItemIDsToEnable:
+    - BedSmall
+    ItemIDsToDisable:
+    - Rug
+    cost: 0
+  - UpgradeID: Towel
+    ItemIDsToEnable:
+    - TowelRackLow
+    ItemIDsToDisable:
+    - TowelRackHigh
+    cost: 0
+  - UpgradeID: Shower
+    ItemIDsToEnable:
+    - Shower
+    ItemIDsToDisable:
+    - Tub
+    cost: 0
+  - UpgradeID: Toilet
+    ItemIDsToEnable:
+    - ToiletSafe
+    ItemIDsToDisable:
+    - ToiletNotSafe
+    cost: 0
+  - UpgradeID: Closet
+    ItemIDsToEnable:
+    - ClosetShort
+    ItemIDsToDisable:
+    - ClosetTall
+    cost: 0
+  - UpgradeID: Stairs
+    ItemIDsToEnable:
+    - StairsSafe
+    ItemIDsToDisable:
+    - Stair
+    cost: 0
