@@ -23,7 +23,9 @@ public class GameManager : MonoBehaviour
     public AIStat stressStat;
 
     public bool firstGame = true;
-    
+
+    public bool tutorialSecondLoopFinished = false;
+
 
 
     private void Awake()
@@ -101,10 +103,21 @@ public class GameManager : MonoBehaviour
     private void HandlePlaying()
     {
 
+       
+            if(ScenesDictionary["MainScene"] != SceneManager.GetActiveScene().buildIndex)
+        {
+            // BlackboardManager.Instance.setSt
+            Debug.Log("Loading GameScene scene.");
+            SceneManager.LoadScene(ScenesDictionary["MainScene"], LoadSceneMode.Single);
+        }
+        else
+        {
+            Debug.Log("Resuming game from paused state.");
+            Time.timeScale = 1f;
+        }
 
-        // BlackboardManager.Instance.setSt
-        Debug.Log("Loading GameScene scene.");
-        SceneManager.LoadScene(ScenesDictionary["MainScene"], LoadSceneMode.Single);
+
+
 
 
     }
@@ -151,8 +164,7 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentState == GameState.Paused)
         {
-            Debug.Log("Resuming game from paused state.");
-            Time.timeScale = 1f;
+
             ChangeState(GameState.Playing);
         }
     }

@@ -40,7 +40,7 @@ public class UpgradesSelection : MonoBehaviour
         {
             NoticePanel.SetActive(true);
             NoticePanelButton.gameObject.SetActive(true);
-            NoticePanelDes.text = "Emily has enough money to make 3 upgrades in her house. Find objects in the house that act as barriers and upgrade them." +
+            NoticePanelDes.text = "Emily has enough money to make 3 upgrades in her house. Find objects in the house that act as barriers, click them and upgrade them." +
                 "Start with the objects that are more difficult to use.";
 
 

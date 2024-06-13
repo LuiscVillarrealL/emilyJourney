@@ -46,6 +46,8 @@ public abstract class BaseInteraction : MonoBehaviour
 
     [SerializeField] protected MinigameBase minigame;
 
+    public bool isTutorial = false;
+
     public void ApplyStatChanges(CommonAIBase performer, float proportion)
     {
         foreach (var statChange in StatChanges)

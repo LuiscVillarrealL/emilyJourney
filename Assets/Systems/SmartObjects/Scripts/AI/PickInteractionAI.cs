@@ -241,6 +241,13 @@ public class PickInteractionAI : CommonAIBase
                         Interaction = interaction,
                         Score = score
                     });
+
+                    if (!GameManager.Instance.tutorialSecondLoopFinished && interaction.isTutorial)
+                    {
+                        GameManager.Instance.tutorialSecondLoopFinished = true;
+                        FindAnyObjectByType<FirstTime>().ContinueTutorial();
+
+                    }
                 }
             }
 

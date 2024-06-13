@@ -27,10 +27,12 @@ public class SmartObject : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (GameManager.Instance.CurrentState == GameState.Playing)
+        if (GameManager.Instance.CurrentState == GameState.Playing || GameManager.Instance.CurrentState == GameState.Paused)
         {
             SmartObjectManager.Instance.RegisterSmartObject(this);
         }
+
+
         
     }
 

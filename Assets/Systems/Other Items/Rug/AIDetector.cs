@@ -16,10 +16,14 @@ public class AIDetector : MonoBehaviour
     public float slowInSpeed = 5f;
     public float slowInAcceleration = 1.5f;
 
+    public float signalRotationSpeed = 5f;
+
     [SerializeField] private CommonAIBase aiBase;
 
     [SerializeField] private AIStatConfiguration rugStat;
     [SerializeField] private AIStatConfiguration rugStat2;
+
+    public GameObject signal;
 
     protected Dictionary<AIStat, float> DecayRates = new Dictionary<AIStat, float>();
 
@@ -36,11 +40,12 @@ public class AIDetector : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(obj.transform.position, Vector3.down, out hit, Mathf.Infinity, rugLayer))
         {
-
+            signal.SetActive(true);          
             Debug.Log("On Rug");
             // You can optionally check the hit.collider to identify the rug
             return true;
         }
+        signal.SetActive(false);
         return false;
     }
 
@@ -54,6 +59,8 @@ public class AIDetector : MonoBehaviour
             // Update stats when on the rug
             aiBase.UpdateStatsOnRug(rugStat);
             aiBase.UpdateStatsOnRug(rugStat2);
+
+
         }
         else
         {

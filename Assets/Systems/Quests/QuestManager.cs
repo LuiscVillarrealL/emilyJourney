@@ -34,7 +34,7 @@ public class QuestManager : MonoBehaviour
     {
         foreach (Transform child in questPanel.transform)
         {
-            Debug.Log($"child {child}");
+            //Debug.Log($"child {child}");
             Destroy(child.gameObject); // Clear existing items
         }
         GameObject QuestList = Instantiate(questItemPrefab, questPanel.transform);
@@ -57,12 +57,16 @@ public class QuestManager : MonoBehaviour
                 stepTitelItem.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
                 foreach (var step in quest.Steps)
                 {
+                    GameObject stepItem = Instantiate(questItemPrefab, questPanel.transform);
+                    
 
                     if (!step.IsCompleted)
                     {
-                        GameObject stepItem = Instantiate(questItemPrefab, questPanel.transform);
-
-                        stepItem.GetComponentInChildren<TextMeshProUGUI>().text = step.StepName;
+                        stepItem.GetComponentInChildren<TextMeshProUGUI>().text = "-" + step.StepName + "";
+                    }
+                    else
+                    {
+                        stepItem.GetComponentInChildren<TextMeshProUGUI>().text = "-" + StrikeText(step.StepName)  + "";
                     }
 
 
@@ -74,6 +78,14 @@ public class QuestManager : MonoBehaviour
 
 
         }
+    }
+
+    private string StrikeText(string input)
+    {
+        const string STRIKE_START = "<s>";
+        const string STRIKE_END = "</s>";
+        string output = STRIKE_START + input + STRIKE_END;
+        return output;
     }
 
 

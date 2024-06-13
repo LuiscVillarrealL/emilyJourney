@@ -23,6 +23,8 @@ public class SimpleInteraction : BaseInteraction
 
     public bool finishMinigame = false;
 
+    
+
     private CommonAIBase currentPerformer;
     private UnityAction<BaseInteraction> currentOnCompleted;
 
